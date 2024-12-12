@@ -51,7 +51,7 @@ if page == "Upload CSV to BigQuery":
     uploaded_file_csv = st.sidebar.file_uploader("Upload CSV File", type=["csv"], key="csv_upload")
 
     # Input for BigQuery table ID
-    table_id = st.sidebar.text_input("Enter BigQuery Table ID", key="table_id")
+    table_id = 'CAS_DS_DATABASE.ca_ds_crm_campaign_target_control'
 
     # Select function
     if_exists_option = st.sidebar.selectbox("Select Function", ["append"], key="if_exists")
