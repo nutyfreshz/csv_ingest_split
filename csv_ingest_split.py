@@ -256,49 +256,6 @@ if page == "Upload CSV to BigQuery":
     else:
         st.warning("Please upload a JSON file.")
 
-    # Load JSON credentials
-    if uploaded_file_json is not None:
-        @st.cache_data
-        def load_json():
-            return json.load(uploaded_file_json)
-
-        json_data = load_json()
-
-        # Use the uploaded JSON file to create credentials
-        credentials = service_account.Credentials.from_service_account_info(json_data)
-
-        # Define BigQuery details
-        project_id = 'cdg-mark-cust-prd'
-
-        # Upload DataFrame to BigQuery if CSV is uploaded, table ID is provided, and button is clicked
-        if uploaded_file is not None and table_id_input and ingest_button:
-            st.markdown("### Uploading to BigQuery")
-            
-            # Initialize progress bar
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            try:
-                total_steps = 100
-                for step in range(total_steps):
-                    # Simulate a step in the uploading process
-                    time.sleep(0.1)  # Simulate work being done
-                    progress_bar.progress(step + 1)
-                    status_text.text(f"Uploading to BigQuery: {step + 1}%")
-
-                pandas_gbq.to_gbq(data, table_id_input, project_id=project_id, if_exists=if_exists_value, credentials=credentials)
-                progress_bar.progress(100)
-                status_text.text("Upload Complete!")
-                st.success("Data uploaded successfully to BigQuery")
-            except BrokenPipeError:
-                pass  # Ignore broken pipe errors
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
-        elif not table_id_input:
-            st.warning("Please enter a BigQuery table ID.")
-    else:
-        st.warning("Please upload a JSON file.")
-
 
 # Page 2: CSV Splitter
 elif page == "CSV Splitter":
