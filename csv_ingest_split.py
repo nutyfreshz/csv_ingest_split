@@ -32,6 +32,9 @@ if page == "Upload CSV to BigQuery":
     st.markdown(
         """<h1>#Caution!!</h1>
         <p>Number of columns and sequences in CSV file need to match with table_id in GBQ.</p>
+        <p>PS. group_name & commu_type & target columns should be exists in CSV file.</p>
+        <p>PSS. commu_type = [SMS,EDM,LINE,T1APP,COL,MART,FB,CALL]</p>
+        <p>For input send_date, commu_type = SMS,EDM then send_date_sms & send_date_edm must be filled!!</p>
         <p>#Instruction</p>
         <ul>
             <li>Upload JSON credential file.</li>
@@ -53,6 +56,33 @@ if page == "Upload CSV to BigQuery":
     # Select function
     if_exists_option = st.sidebar.selectbox("Select Function", ["append"], key="if_exists")
 
+    # Add additional inputs for processing
+    banner_option = st.sidebar.selectbox("Select Banner", ["CDS", "RBS"], key="banner_option")
+    campaign_name_input = st.sidebar.text_input("Enter Campaign name (e.g., 2024-04_RBS_CRM_SUMMER)", key="campaign_name")
+    subgroup_name_input = st.sidebar.text_input("Enter subgroup name (e.g., offer, commu)", key="subgroup_name")
+    start_camp_input = st.sidebar.text_input("Enter start_campaign period (e.g., 2024-04-16)", key="start_campaign")
+    end_camp_input = st.sidebar.text_input("Enter end_campaign period (e.g., 2024-04-26)", key="end_campaign")
+
+    # Input for communication types
+    send_date_inputs = {
+        "SMS": st.sidebar.text_input("Enter send_date_sms (e.g., 2024-04-26)", key="send_date_sms"),
+        "EDM": st.sidebar.text_input("Enter send_date_edm (e.g., 2024-04-26)", key="send_date_edm"),
+        "LINE": st.sidebar.text_input("Enter send_date_line (e.g., 2024-04-26)", key="send_date_line"),
+        "T1APP": st.sidebar.text_input("Enter send_date_t1app (e.g., 2024-04-26)", key="send_date_t1app"),
+        "COL": st.sidebar.text_input("Enter send_date_col (e.g., 2024-04-26)", key="send_date_col"),
+        "MART": st.sidebar.text_input("Enter send_date_martech (e.g., 2024-04-26)", key="send_date_martech"),
+        "FB": st.sidebar.text_input("Enter send_date_facebook (e.g., 2024-04-26)", key="send_date_fb"),
+        "CALL": st.sidebar.text_input("Enter send_date_call (e.g., 2024-04-26)", key="send_date_call")
+    }
+
+    req_option = st.sidebar.selectbox("Select requester", [
+        "Itthikan C.", "Pichaporn K.", "Dudsadee W.", "Tanut P.", "Bodee B.", "Kamontip A.", "Lalita P.", "Sypabhas T.", "Thus S."
+    ], key="requester")
+
+    owner_option = st.sidebar.selectbox("Select data_owner", [
+        "BI Dashboard", "Kamontip A.", "Kittipob S.", "Nutchapong L.", "Paniti T.", "Pattamaporn V.", "Phat P.", "Pornpawit J."
+    ], key="data_owner")
+
     # Button to trigger ingestion
     if st.sidebar.button("Let's Ingest"):
         st.session_state["ingest_pressed"] = True
@@ -68,6 +98,19 @@ if page == "Upload CSV to BigQuery":
 
                 # Load CSV data
                 data = pd.read_csv(uploaded_file_csv)
+
+                # Add additional fields
+                data["banner"] = banner_option
+                data["campaign_name"] = campaign_name_input
+                data["subgroup_name"] = subgroup_name_input
+                data["start_campaign"] = start_camp_input
+                data["end_campaign"] = end_camp_input
+
+                for comm_type, send_date in send_date_inputs.items():
+                    data[f"send_date_{comm_type.lower()}"] = send_date
+
+                data["requester"] = req_option
+                data["data_owner"] = owner_option
 
                 # Display data sample
                 st.write("### Data Sample")
